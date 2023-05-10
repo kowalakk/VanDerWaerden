@@ -32,10 +32,7 @@ namespace Ai
 
         private void UctSearch(Node root)
         {
-            var watch = new System.Diagnostics.Stopwatch();
             int iterations = 0;
-            watch.Start();
-
             while (!StopCondition.StopConditionOccured())
             {
                 Node node = TreePolicy(root);
@@ -43,10 +40,6 @@ namespace Ai
                 Backup(node, gameResult);
                 iterations++;
             }
-
-            watch.Stop();
-            Console.WriteLine($"UCT search execution time: {watch.ElapsedMilliseconds} ms" +
-                $" - {(double)watch.ElapsedMilliseconds / iterations} ms/iteration");
         }
 
         private Node TreePolicy(Node node)
