@@ -1,11 +1,10 @@
 ﻿using VanDerWaerden;
-using Action = VanDerWaerden.Action;
 
 namespace Ai
 {
     public record Node
     {
-        public Action? CorespondingAction { get; set; }
+        public int? CorespondingAction { get; set; }
         public State CorespondingState { get; set; }
         public Node? Parent { get; set; }
         public List<Node> ExpandedChildren { get; set; }
@@ -22,7 +21,7 @@ namespace Ai
             VisitCount = 0;
             SuccessCount = 0;
         }
-        public Node(Action action, State state, Node? parent = null)
+        public Node(int action, State state, Node? parent = null)
         {
             CorespondingAction = action;
             CorespondingState = state;

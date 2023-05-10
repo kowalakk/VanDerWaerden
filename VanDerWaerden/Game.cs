@@ -15,15 +15,18 @@
     }
     public class Game
     {
-        public int Numbers { get; }
-        public Game(int numbers)
+        public int NumbersCount { get; }
+        public int WinningSequenceCount { get; }
+
+        public Game(int numbersCount, int winningSequenceCount)
         {
-            Numbers = numbers;
+            NumbersCount = numbersCount;
+            WinningSequenceCount = winningSequenceCount;
         }
 
         public State InitialState()
         {
-            throw new NotImplementedException();
+            return new State(NumbersCount);
         }
 
         public Player CurrentPlayer(State state)
@@ -31,19 +34,59 @@
             return state.CurrentPlayer;
         }
 
-        public IEnumerable<Action> PossibleActions(State state)
+        public IEnumerable<int> PossibleActions(State state)
         {
-            throw new NotImplementedException();
+            List<int> actions = new List<int>();
+            for (int i = 0; i < NumbersCount; i++)
+            {
+                if (state.Numbers[i] == Player.None)
+                    actions.Add(i);
+            }
+            return actions;
         }
 
-        public State PerformAction(Action action, State state)
+        public State PerformAction(int action, State state)
         {
-            throw new NotImplementedException();
+            Player[] numbers = (Player[])state.Numbers.Clone();
+            numbers[action] = state.CurrentPlayer;
+            bool[] checkedNumbers = new bool[NumbersCount];
+            Sequence longestSequence = new(action, 0, 1);
+            for (int step = 1; step < Math.Max(action + 1, NumbersCount - action); step++)
+            {
+                int sequenceLength = 1;
+                int previousNumber = action - step;
+                while (previousNumber >= 0 && !checkedNumbers[previousNumber]) // can optimize
+                {
+                    checkedNumbers[previousNumber] = true;
+                    if (numbers[previousNumber] == state.CurrentPlayer)
+                    {
+                        sequenceLength++;
+                        previousNumber -= step;
+                    }
+                }
+                int nextNumber = action + step;
+                while (nextNumber < NumbersCount && !checkedNumbers[nextNumber]) // can optimize
+                {
+                    checkedNumbers[nextNumber] = true;
+                    if (numbers[nextNumber] == state.CurrentPlayer)
+                    {
+                        sequenceLength++;
+                        nextNumber += step;
+                    }
+                }
+                if (sequenceLength > longestSequence.Length)
+                    longestSequence = new(previousNumber + step, step, sequenceLength);
+            }
+            return new State(numbers, state.CurrentPlayer == Player.One ? Player.Two : Player.One, longestSequence);
         }
 
         public GameResult Result(State state)
         {
-            throw new NotImplementedException();
+            if (state.LongestSequence.Length >= WinningSequenceCount)
+                return (GameResult)state.CurrentPlayer;
+            if (PossibleActions(state).Count() == 0) // can optimize
+                return GameResult.Draw;
+            return GameResult.InProgress;
         }
 
     }

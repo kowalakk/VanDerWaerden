@@ -1,5 +1,4 @@
 ﻿using VanDerWaerden;
-using Action = VanDerWaerden.Action;
 
 namespace Ai
 {
@@ -16,7 +15,7 @@ namespace Ai
             Game = game;
         }
 
-        public List<(Action, double)> MoveAssessment(GameTree gameTree)
+        public List<(int?, double)> MoveAssessment(GameTree gameTree)
         {
             UctSearch(gameTree.SelectedNode);
             return gameTree.SelectedNode.ExpandedChildren
@@ -24,7 +23,7 @@ namespace Ai
                 .ToList();
         }
 
-        public Action ChooseAction(GameTree gameTree)
+        public int? ChooseAction(GameTree gameTree)
         {
             return MoveAssessment(gameTree)
                 .MaxBy(action => { return action.Item2; })
@@ -71,7 +70,7 @@ namespace Ai
         {
             if (node.UnexpandedChildren == null)
             {
-                IEnumerable<Action> possibleActions = Game.PossibleActions(node.CorespondingState);
+                IEnumerable<int> possibleActions = Game.PossibleActions(node.CorespondingState);
                 List<Node> unexpandedChildren = new();
                 foreach (Action action in possibleActions)
                 {
@@ -89,8 +88,8 @@ namespace Ai
             GameResult gameResult = Game.Result(state);
             while (gameResult == GameResult.InProgress)
             {
-                IEnumerable<Action> possibleActions = Game.PossibleActions(state);
-                Action randomAction = possibleActions.RandomElement();
+                IEnumerable<int> possibleActions = Game.PossibleActions(state);
+                int randomAction = possibleActions.RandomElement();
                 state = Game.PerformAction(randomAction, state);
                 gameResult = Game.Result(state);
             }
@@ -124,7 +123,7 @@ namespace Ai
             return (double)node.SuccessCount / node.VisitCount + UctConstant * Math.Sqrt(2 * Math.Log(node.Parent!.VisitCount) / node.VisitCount);
         }
 
-        public void MoveGameToNextState(GameTree gameTree, Action action)
+        public void MoveGameToNextState(GameTree gameTree, int action)
         {
             gameTree.SelectChildNode(action);
         }

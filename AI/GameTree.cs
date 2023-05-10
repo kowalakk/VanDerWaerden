@@ -1,4 +1,6 @@
-﻿namespace Ai
+﻿using VanDerWaerden;
+
+namespace Ai
 {
     public class GameTree
     {
@@ -11,7 +13,7 @@
             SelectedNode = Root;
         }
 
-        public void SelectChildNode(Action action)
+        public void SelectChildNode(int action)
         {
             foreach (Node child in SelectedNode.ExpandedChildren)
             {
