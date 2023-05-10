@@ -77,13 +77,18 @@
                 if (sequenceLength > longestSequence.Length)
                     longestSequence = new(previousNumber + step, step, sequenceLength);
             }
-            return new State(numbers, state.CurrentPlayer == Player.One ? Player.Two : Player.One, longestSequence);
+            Dictionary<Player, Sequence> newDict = new Dictionary<Player, Sequence>(state.LongestSequences);
+            if (longestSequence.Length > newDict[state.CurrentPlayer].Length)
+                newDict[state.CurrentPlayer] = longestSequence;
+            return new State(numbers, state.CurrentPlayer == Player.One ? Player.Two : Player.One, newDict);
         }
 
         public GameResult Result(State state)
         {
-            if (state.LongestSequence.Length >= WinningSequenceCount)
-                return (GameResult)state.CurrentPlayer;
+            if (state.LongestSequences[Player.One].Length >= WinningSequenceCount)
+                return GameResult.PlayerOneWins;
+            if (state.LongestSequences[Player.Two].Length >= WinningSequenceCount)
+                return GameResult.PlayerTwoWins;
             if (PossibleActions(state).Count() == 0) // can optimize
                 return GameResult.Draw;
             return GameResult.InProgress;

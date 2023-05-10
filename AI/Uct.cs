@@ -72,7 +72,7 @@ namespace Ai
             {
                 IEnumerable<int> possibleActions = Game.PossibleActions(node.CorespondingState);
                 List<Node> unexpandedChildren = new();
-                foreach (Action action in possibleActions)
+                foreach (int action in possibleActions)
                 {
                     State childState = Game.PerformAction(action, node.CorespondingState);
                     Node childNode = new(action, childState, node);

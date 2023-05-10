@@ -6,7 +6,7 @@
 
         public readonly Player[] Numbers;
 
-        public Sequence LongestSequence { get; }
+        public Dictionary<Player, Sequence> LongestSequences { get; }
 
         public State(int numbersCount)
         {
@@ -16,10 +16,10 @@
                 Numbers[i] = Player.None;
             }
             CurrentPlayer = Player.One;
-            LongestSequence = new(0,0,0);
+            LongestSequences = new() { {Player.One,new(0,0,0) }, { Player.Two, new(0, 0, 0) } };
         }
 
-        public State(Player[] numbers, Player currentPlayer, Sequence sequence)
+        public State(Player[] numbers, Player currentPlayer, Dictionary<Player, Sequence> longestSequences)
         {
             Numbers = new Player[numbers.Length];
             for (int i = 0; i < numbers.Length; i++)
@@ -27,7 +27,7 @@
                 Numbers[i] = numbers[i];
             }
             CurrentPlayer = currentPlayer;
-            LongestSequence = sequence;
+            LongestSequences = longestSequences;
         }
     }
 }
