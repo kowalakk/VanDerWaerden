@@ -1,10 +1,12 @@
 ﻿namespace VanDerWaerden
 {
-    public readonly struct State
+    public record struct Sequence(int FirstElement, int Step, int Length);
+
+    public readonly record struct State
     {
         public Player CurrentPlayer { get; }
 
-        public readonly Player[] Numbers;
+        public Player[] Numbers { get; }
 
         public Dictionary<Player, Sequence> LongestSequences { get; }
 
