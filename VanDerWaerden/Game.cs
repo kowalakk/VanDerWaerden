@@ -44,8 +44,7 @@
             }
             return actions;
         }
-
-        public State PerformAction(int action, State state)
+        public State PerformActionButSlower(int action, State state)
         {
             Player[] players = (Player[])state.Numbers.Clone();
             players[action] = state.CurrentPlayer;
@@ -70,6 +69,7 @@
                 {
                     int lenght = 2;
                     int step = numbers[j] - numbers[i];
+                    if (step + 1 > Math.Ceiling(NumbersCount * 1.0 / WinningSequenceCount)) continue; // Heuristics 
                     int k = j + 1;
                     while(k < numbers.Count && numbers[k] <= numbers[i] + lenght * step)
                     {
@@ -100,7 +100,7 @@
             return new State(numbers, state.CurrentPlayer, newDict);
         }
 
-        public State PerformActionOld(int action, State state)
+        public State PerformAction(int action, State state)
         {
             Player[] numbers = (Player[])state.Numbers.Clone();
             numbers[action] = state.CurrentPlayer;

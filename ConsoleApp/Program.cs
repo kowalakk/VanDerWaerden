@@ -1,4 +1,5 @@
 ﻿using Ai;
+using System.Diagnostics;
 using VanDerWaerden;
 
 internal class Program
@@ -27,6 +28,7 @@ internal class Program
                 ai.MoveGameToNextState(gameTree, nextAction);
                 currentState = gameTree.SelectedNode.CorespondingState;
                 gameResult = game.Result(currentState);
+
             }
             if (gameResult == GameResult.PlayerOneWins)
                 Console.WriteLine($"Gracz pierwszy wygrywa!");
@@ -34,6 +36,8 @@ internal class Program
                 Console.WriteLine($"Gracz drugi wygrywa!");
             else
                 Console.WriteLine($"Remis");
+            Console.WriteLine(currentState.LongestSequences[Player.One]);
+            Console.WriteLine(currentState.LongestSequences[Player.Two]);
         }
     }
 }
