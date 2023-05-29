@@ -47,6 +47,61 @@
 
         public State PerformAction(int action, State state)
         {
+            Player[] players = (Player[])state.Numbers.Clone();
+            players[action] = state.CurrentPlayer;
+            Dictionary<Player, Sequence> newDict = new Dictionary<Player, Sequence>(state.LongestSequences);
+            Sequence longestSequence = new(action, 0, 1);
+
+            List<int> numbers = Enumerable.Range(0, state.Numbers.Length)
+             .Where(i => state.Numbers[i] == state.CurrentPlayer || i == action)
+             .ToList();
+            
+            if(numbers.Count == 1)
+            {
+                if (1 > newDict[state.CurrentPlayer].Length)
+                    newDict[state.CurrentPlayer] = longestSequence;
+                return new State(players, state.CurrentPlayer == Player.One ? Player.Two : Player.One, newDict);
+            }
+
+            int max_lenght = 1;
+            for (int i = 0; i < numbers.Count; i++)
+            {
+                for (int j = i + 1; j < numbers.Count; j++)
+                {
+                    int lenght = 2;
+                    int step = numbers[j] - numbers[i];
+                    int k = j + 1;
+                    while(k < numbers.Count && numbers[k] <= numbers[i] + lenght * step)
+                    {
+                        if(numbers[k] == numbers[i] + lenght * step)
+                        {
+                            lenght++;
+                        }
+                        k++;
+                    }
+                    if (lenght > max_lenght)
+                    {
+                        max_lenght = lenght;
+                        longestSequence = new Sequence(numbers[i], step, lenght);
+                    }
+                }
+            }
+
+            if (longestSequence.Length > newDict[state.CurrentPlayer].Length)
+                newDict[state.CurrentPlayer] = longestSequence;
+            return new State(players, state.CurrentPlayer == Player.One ? Player.Two : Player.One, newDict);
+        }
+
+        public State NextState(int action, Player player, State state)
+        {
+            Player[] numbers = (Player[])state.Numbers.Clone();
+            numbers[action] = player;
+            Dictionary<Player, Sequence> newDict = new Dictionary<Player, Sequence>(state.LongestSequences);
+            return new State(numbers, state.CurrentPlayer, newDict);
+        }
+
+        public State PerformActionOld(int action, State state)
+        {
             Player[] numbers = (Player[])state.Numbers.Clone();
             numbers[action] = state.CurrentPlayer;
             bool[] checkedNumbers = new bool[NumbersCount];
