@@ -2,6 +2,7 @@
 {
     public interface IStopCondition
     {
-        public bool StopConditionOccured();
+        public bool Occured();
+        public void Advance();
     }
 }

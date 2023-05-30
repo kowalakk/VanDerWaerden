@@ -32,13 +32,12 @@ namespace Ai
 
         private void UctSearch(Node root)
         {
-            int iterations = 0;
-            while (!StopCondition.StopConditionOccured())
+            while (!StopCondition.Occured())
             {
                 Node node = TreePolicy(root);
                 GameResult gameResult = DefaultPolicy(node.CorespondingState);
                 Backup(node, gameResult);
-                iterations++;
+                StopCondition.Advance();
             }
         }
 
@@ -94,7 +93,7 @@ namespace Ai
             int delta = -1;
             if (gameResult == GameResult.Draw)
                 delta = 0;
-            if (gameResult == (GameResult)Game.CurrentPlayer(node.CorespondingState))
+            else if (gameResult == (GameResult)Game.CurrentPlayer(node.CorespondingState))
                 delta = 1;
             Node? predecessor = node;
             while (predecessor != null)

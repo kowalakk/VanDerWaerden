@@ -6,28 +6,29 @@
     {
         public Player CurrentPlayer { get; }
 
-        public Player[] Numbers { get; }
+        public Dictionary<Player, HashSet<int>> Numbers { get; }
 
         public Dictionary<Player, Sequence> LongestSequences { get; }
 
         public State(int numbersCount)
         {
-            Numbers = new Player[numbersCount];
+            Numbers = new Dictionary<Player, HashSet<int>>
+            {
+                [Player.None] = new HashSet<int>(),
+                [Player.One] = new HashSet<int>(),
+                [Player.Two] = new HashSet<int>()
+            };
             for (int i = 0; i < numbersCount; i++)
             {
-                Numbers[i] = Player.None;
+                Numbers[Player.None].Add(i);
             }
             CurrentPlayer = Player.One;
             LongestSequences = new() { {Player.One,new(0,0,0) }, { Player.Two, new(0, 0, 0) } };
         }
 
-        public State(Player[] numbers, Player currentPlayer, Dictionary<Player, Sequence> longestSequences)
+        public State(Dictionary<Player, HashSet<int>> numbers, Player currentPlayer, Dictionary<Player, Sequence> longestSequences)
         {
-            Numbers = new Player[numbers.Length];
-            for (int i = 0; i < numbers.Length; i++)
-            {
-                Numbers[i] = numbers[i];
-            }
+            Numbers = numbers;
             CurrentPlayer = currentPlayer;
             LongestSequences = longestSequences;
         }
