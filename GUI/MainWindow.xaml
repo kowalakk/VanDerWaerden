@@ -43,7 +43,7 @@
                         <RowDefinition Height="3*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBox TextWrapping="Wrap" Text="00:00" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Row="1" FontSize="24" IsReadOnly="True" BorderThickness="0,0,0,0"/>
+                    <TextBox Name="GameTimerTB" TextWrapping="Wrap" Text="00:00" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Row="1" FontSize="24" IsReadOnly="True" BorderThickness="0,0,0,0"/>
                     <TextBox TextWrapping="Wrap" Text="00:00" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Row="3" IsReadOnly="True" FontSize="16" BorderThickness="0,0,0,0"/>
                 </Grid>
             </Grid>

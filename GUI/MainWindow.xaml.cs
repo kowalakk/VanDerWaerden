@@ -17,6 +17,8 @@ using Ai;
 using VanDerWaerden;
 using System.Collections;
 using System.ComponentModel;
+using System.Windows.Threading;
+using System.Globalization;
 
 namespace GUI
 {
@@ -31,6 +33,7 @@ namespace GUI
         Brush PlayerTwoColor = Brushes.Red;
         VanDerWaerdenGameSettings? configuration;
         BackgroundWorker backgroundWorker;
+        DispatcherTimer gameTimer;
         Game? game;
         State currentState;
         GameTree? gameTree;
@@ -42,6 +45,10 @@ namespace GUI
             settings.ShowDialog();
             Configuration GameConfiguration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             configuration = (VanDerWaerdenGameSettings)GameConfiguration.GetSection("VanDerWaerdenGameSettings");
+
+            gameTimer = new DispatcherTimer();
+            gameTimer.Tick += GameTimer_Tick;
+            gameTimer.Interval = new TimeSpan(0, 0, 1);
 
             backgroundWorker = new BackgroundWorker()
             {
@@ -74,6 +81,7 @@ namespace GUI
 
         private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            gameTimer.Stop();
             Dispatcher.BeginInvoke(new Action(() => { StartButton.IsEnabled = true; }));
         }
 
@@ -123,11 +131,22 @@ namespace GUI
             PlayeOneNumbers = new List<int>();
             PlayeTwoNumbers = new List<int>();
             StartButton.IsEnabled = false;
+            
+            GameTimerTB.Text = "00:00";
+            gameTimer.Start();
+
             game = new(configuration.N, configuration.K);
             uct = new(1.414, new IterationStopCondition(1000), game);
             currentState = game.InitialState();
             gameTree = new(currentState);
             backgroundWorker.RunWorkerAsync();
+        }
+
+        private void GameTimer_Tick(object? sender, EventArgs e)
+        {
+            DateTime time = DateTime.ParseExact(GameTimerTB.Text, "mm:ss", CultureInfo.InvariantCulture);
+            time = time.AddSeconds(1);
+            GameTimerTB.Text = time.ToString("mm:ss");
         }
     }
 }
