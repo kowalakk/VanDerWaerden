@@ -83,7 +83,7 @@ namespace GUI
 
                 int nextAction = (int)currentPlayer.ReturnNextMove(gameTree.SelectedNode)!;
                 if (currentState.CurrentPlayer == Player.One) { PlayerOneNumbers.Add(nextAction); } else { PlayerTwoNumbers.Add(nextAction); }
-                gameTree.SelectChildNode(nextAction);
+                gameTree.MoveGameToNextState(nextAction);
 
                 currentState = gameTree.SelectedNode.CorespondingState;
                 gameResult = game.Result(currentState);
@@ -177,7 +177,7 @@ namespace GUI
             playerTwo = InitiatePlayerAlgorithm(configuration.Player2);
 
             currentState = game.InitialState();
-            gameTree = new(currentState);
+            gameTree = new(currentState, game);
             backgroundWorker.RunWorkerAsync();
         }
         private IAlgorithm InitiatePlayerAlgorithm(string alg)
@@ -189,7 +189,7 @@ namespace GUI
                 case "MinMax":
                     return new MiniMax(new IterationStopCondition(1000), game);
                 case "Random":
-                    break;
+                    return new RandomPick(game);
                 default:
                     break;
             }

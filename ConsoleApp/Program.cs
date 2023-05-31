@@ -16,10 +16,11 @@ internal class Program
             int winningSequenceCount = Convert.ToInt32(Console.ReadLine());
             Game game = new(numbersCount, winningSequenceCount);
             IAlgorithm playerOne = new Uct(1.414, new IterationStopCondition(1000), game);
-            IAlgorithm playerTwo = new MiniMax(new IterationStopCondition(1000), game);
+            IAlgorithm playerTwo = new RandomPick(game);
+            //IAlgorithm playerTwo = new MiniMax(new IterationStopCondition(1000), game);
  
             State currentState = game.InitialState();
-            GameTree gameTree = new(currentState);
+            GameTree gameTree = new(currentState, game);
 
             GameResult gameResult = game.Result(currentState);
             while (gameResult == GameResult.InProgress)
