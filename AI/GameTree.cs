@@ -25,5 +25,10 @@ namespace Ai
             }
             throw new ArgumentException();
         }
+
+        public void MoveGameToNextState(int action)
+        {
+            SelectChildNode(action);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Ai;
+using System.Diagnostics;
 using VanDerWaerden;
 
 internal class Program
@@ -31,9 +32,6 @@ internal class Program
                 Console.WriteLine($"Gracz {player} koloruje {nextAction}");
                 gameTree.SelectChildNode(nextAction);
 
-                nextAction = miniMax.Search(currentState);
-                Console.WriteLine($"Gracz drugi koloruje {nextAction}");
-                uct.MoveGameToNextState(gameTree, nextAction);
                 currentState = gameTree.SelectedNode.CorespondingState;
                 gameResult = game.Result(currentState);
             }
@@ -43,8 +41,6 @@ internal class Program
                 Console.WriteLine($"Gracz drugi wygrywa!");
             else
                 Console.WriteLine($"Remis");
-            Console.WriteLine(currentState.LongestSequences[Player.One]);
-            Console.WriteLine(currentState.LongestSequences[Player.Two]);
         }
     }
 }

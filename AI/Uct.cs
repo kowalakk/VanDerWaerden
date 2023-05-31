@@ -1,8 +1,9 @@
-﻿using VanDerWaerden;
+﻿using System.Xml.Linq;
+using VanDerWaerden;
 
 namespace Ai
 {
-    public class Uct
+    public class Uct : IAlgorithm
     { 
         private IStopCondition StopCondition { get; set; }
         private double UctConstant { get; }
@@ -22,11 +23,12 @@ namespace Ai
                 .Item1!;
         }
 
-        public int? ChooseAction(GameTree gameTree)
+        private List<(int?, double)> MoveAssessment(Node gameNode)
         {
-            return MoveAssessment(gameTree)
-                .MaxBy(action => { return action.Item2; })
-                .Item1;
+            UctSearch(gameNode);
+            return gameNode.ExpandedChildren
+                .Select(child => (child.CorespondingAction!, -(double)child.SuccessCount / child.VisitCount))
+                .ToList();
         }
 
         private void UctSearch(Node root)
@@ -113,11 +115,5 @@ namespace Ai
         {
             return (double)node.SuccessCount / node.VisitCount + UctConstant * Math.Sqrt(2 * Math.Log(node.Parent!.VisitCount) / node.VisitCount);
         }
-
-        public void MoveGameToNextState(GameTree gameTree, int action)
-        {
-            gameTree.SelectChildNode(action);
-        }
-
     }
 }

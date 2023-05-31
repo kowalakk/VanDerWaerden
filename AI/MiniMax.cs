@@ -2,7 +2,7 @@
 
 namespace Ai
 {
-    public class MiniMax
+    public class MiniMax : IAlgorithm
     {
         private Game Game { get; }
         private int Depth { get; set; }
