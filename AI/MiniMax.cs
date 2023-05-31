@@ -2,7 +2,7 @@
 
 namespace Ai
 {
-    public class MiniMax
+    public class MiniMax : IAlgorithm
     {
         private IStopCondition StopCondition { get; set; }
         private Game Game { get; }
@@ -10,6 +10,10 @@ namespace Ai
         {
             StopCondition = condition;
             Game = game;
+        }
+        public int? ReturnNextMove(Node node)
+        {
+            return Search(node.CorespondingState);
         }
         public int Search(State state)
         {

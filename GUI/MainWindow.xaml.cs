@@ -27,18 +27,19 @@ namespace GUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        List<int> PlayeOneNumbers = new List<int>();
-        List<int> PlayeTwoNumbers = new List<int>();
+        List<int> PlayerOneNumbers = new List<int>();
+        List<int> PlayerTwoNumbers = new List<int>();
         Brush PlayerOneColor = Brushes.Blue;
         Brush PlayerTwoColor = Brushes.Red;
-        VanDerWaerdenGameSettings? configuration;
+        VanDerWaerdenGameSettings configuration;
         BackgroundWorker backgroundWorker;
         DispatcherTimer gameTimer;
         DispatcherTimer moveTimer;
-        Game? game;
+        Game game;
         State currentState;
-        GameTree? gameTree;
-        Uct? uct;
+        GameTree gameTree;
+        IAlgorithm playerOne;
+        IAlgorithm playerTwo;
         public MainWindow()
         {
             InitializeComponent();
@@ -62,6 +63,8 @@ namespace GUI
             backgroundWorker.DoWork += backgroundWorker_DoWork;
             backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
             backgroundWorker.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
+
+            RedrawBoard();
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -75,14 +78,18 @@ namespace GUI
             while (gameResult == GameResult.InProgress)
             {
                 moveTimer.Start();
-                int nextAction = (int)uct.ChooseAction(gameTree)!;
-                string gracz = currentState.CurrentPlayer == Player.One ? "pierwszy" : "drugi";
-                if (currentState.CurrentPlayer == Player.One) { PlayeOneNumbers.Add(nextAction); } else { PlayeTwoNumbers.Add(nextAction); }
-                uct.MoveGameToNextState(gameTree, nextAction);
+
+                IAlgorithm currentPlayer = currentState.CurrentPlayer == Player.One ? playerOne : playerTwo;
+
+                int nextAction = (int)currentPlayer.ReturnNextMove(gameTree.SelectedNode)!;
+                if (currentState.CurrentPlayer == Player.One) { PlayerOneNumbers.Add(nextAction); } else { PlayerTwoNumbers.Add(nextAction); }
+                gameTree.SelectChildNode(nextAction);
+
                 currentState = gameTree.SelectedNode.CorespondingState;
                 gameResult = game.Result(currentState);
-                backgroundWorker.ReportProgress(1);
+
                 moveTimer.Stop();
+                backgroundWorker.ReportProgress(1);
             }
         }
 
@@ -106,16 +113,17 @@ namespace GUI
 
             MessageBox.Show(messageBoxText, caption, button, icon, MessageBoxResult.OK);
         }
-
-        public void RefreshUI()
+        private void RedrawBoard()
         {
             FlowDocument flowDocument = new FlowDocument();
             Paragraph paragraph = new Paragraph();
-            foreach (int i in Enumerable.Range(0, configuration.N)){
-                if (PlayeOneNumbers.Contains(i)) { 
+            foreach (int i in Enumerable.Range(0, configuration.N))
+            {
+                if (PlayerOneNumbers != null && PlayerOneNumbers.Contains(i))
+                {
                     paragraph.Inlines.Add(ColorNumber(i, PlayerOneColor));
                 }
-                else if (PlayeTwoNumbers.Contains(i))
+                else if (PlayerTwoNumbers != null && PlayerTwoNumbers.Contains(i))
                 {
                     paragraph.Inlines.Add(ColorNumber(i, PlayerTwoColor));
                 }
@@ -128,6 +136,10 @@ namespace GUI
             flowDocument.Blocks.Add(paragraph);
 
             GameStateTextBox.Document = flowDocument;
+        }
+        private void RefreshUI()
+        {
+            RedrawBoard();
 
             PlayerOneScoreTB.Text = currentState.LongestSequences[Player.One].Length.ToString();
             PlayerTwoScoreTB.Text = currentState.LongestSequences[Player.Two].Length.ToString();
@@ -138,12 +150,12 @@ namespace GUI
             MoveTimerTB.Text = "00:00";
         }
 
-        public string GetSequenceString(Player player)
+        private string GetSequenceString(Player player)
         {
             return string.Join(", ", Enumerable.Range(0, currentState.LongestSequences[player].Length).Select(y => y * currentState.LongestSequences[player].Step).Select(x => x + currentState.LongestSequences[player].FirstElement).ToArray());
         }
 
-        public Run ColorNumber(int number, Brush brush)
+        private Run ColorNumber(int number, Brush brush)
         {
             Run run = new Run(number.ToString());
             run.Foreground = brush;
@@ -152,18 +164,36 @@ namespace GUI
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            PlayeOneNumbers = new List<int>();
-            PlayeTwoNumbers = new List<int>();
+            PlayerOneNumbers = new List<int>();
+            PlayerTwoNumbers = new List<int>();
             StartButton.IsEnabled = false;
             
             GameTimerTB.Text = "00:00";
             gameTimer.Start();
 
             game = new(configuration.N, configuration.K);
-            uct = new(1.414, new IterationStopCondition(1000), game);
+
+            playerOne = InitiatePlayerAlgorithm(configuration.Player1);
+            playerTwo = InitiatePlayerAlgorithm(configuration.Player2);
+
             currentState = game.InitialState();
             gameTree = new(currentState);
             backgroundWorker.RunWorkerAsync();
+        }
+        private IAlgorithm InitiatePlayerAlgorithm(string alg)
+        {
+            switch (alg)
+            {
+                case "UCT":
+                    return new Uct(1.414, new IterationStopCondition(1000), game);
+                case "MinMax":
+                    return new MiniMax(new IterationStopCondition(1000), game);
+                case "Random":
+                    break;
+                default:
+                    break;
+            }
+            return null;
         }
 
         private void GameTimer_Tick(object? sender, EventArgs e)
