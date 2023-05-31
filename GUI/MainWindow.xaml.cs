@@ -90,6 +90,21 @@ namespace GUI
         {
             gameTimer.Stop();
             Dispatcher.BeginInvoke(new Action(() => { StartButton.IsEnabled = true; }));
+            GameResult gameResult = game.Result(currentState);
+
+            string caption = "Koniec Gry!";
+            string messageBoxText;
+            MessageBoxButton button = MessageBoxButton.OK;
+            MessageBoxImage icon = MessageBoxImage.None;
+
+            if (gameResult == GameResult.PlayerOneWins)
+                messageBoxText = "Gracz pierwszy wygrywa!";
+            else if (gameResult == GameResult.PlayerTwoWins)
+                messageBoxText = "Gracz drugi wygrywa!";
+            else
+                messageBoxText = "Remis";
+
+            MessageBox.Show(messageBoxText, caption, button, icon, MessageBoxResult.OK);
         }
 
         public void RefreshUI()
