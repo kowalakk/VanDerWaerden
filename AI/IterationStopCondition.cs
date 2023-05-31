@@ -8,9 +8,13 @@
         {
             MaxIterations = CurrentIterations = iterations;
         }
-        public bool StopConditionOccured()
+        public void Advance()
         {
-            if (CurrentIterations-- == 0)
+            CurrentIterations--;
+        }
+        public bool Occured()
+        {
+            if (CurrentIterations <= 0)
             {
                 CurrentIterations = MaxIterations;
                 return true;

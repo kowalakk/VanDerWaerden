@@ -13,22 +13,22 @@ namespace Tests
             State state = game.InitialState();
 
             state = game.PerformAction(2, state);
-            Assert.Equal(Player.One, state.Numbers[2]);
+            Assert.Contains(2, state.Numbers[Player.One]);
             Assert.Equal(Player.Two, state.CurrentPlayer);
             Assert.Equal(new Sequence(2, 0, 1), state.LongestSequences[Player.One]);
             Assert.Equal(new Sequence(0, 0, 0), state.LongestSequences[Player.Two]);
 
             state = game.PerformAction(3, state);
-            Assert.Equal(Player.One, state.Numbers[2]);
-            Assert.Equal(Player.Two, state.Numbers[3]);
+            Assert.Contains(2, state.Numbers[Player.One]);
+            Assert.Contains(3, state.Numbers[Player.Two]);
             Assert.Equal(Player.One, state.CurrentPlayer);
             Assert.Equal(new Sequence(2, 0, 1), state.LongestSequences[Player.One]);
             Assert.Equal(new Sequence(3, 0, 1), state.LongestSequences[Player.Two]);
 
             state = game.PerformAction(4, state);
-            Assert.Equal(Player.One, state.Numbers[2]);
-            Assert.Equal(Player.Two, state.Numbers[3]);
-            Assert.Equal(Player.One, state.Numbers[4]);
+            Assert.Contains(2, state.Numbers[Player.One]);
+            Assert.Contains(3, state.Numbers[Player.Two]);
+            Assert.Contains(4, state.Numbers[Player.One]);
             Assert.Equal(Player.Two, state.CurrentPlayer);
             Assert.Equal(new Sequence(2, 2, 2), state.LongestSequences[Player.One]);
             Assert.Equal(new Sequence(3, 0, 1), state.LongestSequences[Player.Two]);
