@@ -39,6 +39,6 @@
             <ComboBox Name="Player1ComboBox" SelectedItem="{Binding Player1}" Grid.Row="3" Grid.Column="1" VerticalContentAlignment="Center"/>
             <ComboBox Name="Player2ComboBox" SelectedItem="{Binding Player2}" Grid.Row="4" Grid.Column="1" VerticalContentAlignment="Center"/>
         </Grid>
-        <Button Grid.Column="1" Content="Start" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" FontSize="22" Padding="15,5,15,5" Click="Button_Click"/>
+        <Button Grid.Column="1" Content="Save" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" FontSize="22" Padding="15,5,15,5" Click="Button_Click"/>
     </Grid>
 </Window>

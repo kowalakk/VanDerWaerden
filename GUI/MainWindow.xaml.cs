@@ -31,10 +31,10 @@ namespace GUI
         Brush PlayerTwoColor = Brushes.Red;
         VanDerWaerdenGameSettings? configuration;
         BackgroundWorker backgroundWorker;
-        Game game;
+        Game? game;
         State currentState;
-        GameTree gameTree;
-        Uct uct;
+        GameTree? gameTree;
+        Uct? uct;
         public MainWindow()
         {
             InitializeComponent();
@@ -50,28 +50,6 @@ namespace GUI
             backgroundWorker.DoWork += backgroundWorker_DoWork;
             backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
             backgroundWorker.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
-
-            Refresh();
-        }
-        public void PlayGame()
-        {
-            Game game = new(configuration.N, configuration.K);
-            Uct uct = new(1.414, new IterationStopCondition(1000), game);
-
-            State currentState = game.InitialState();
-            GameTree gameTree = new(currentState);
-
-            GameResult gameResult = game.Result(currentState);
-            while (gameResult == GameResult.InProgress)
-            {
-                int nextAction = (int)uct.ChooseAction(gameTree)!;
-                string gracz = currentState.CurrentPlayer == Player.One ? "pierwszy" : "drugi";
-                if(currentState.CurrentPlayer == Player.One) { PlayeOneNumbers.Add(nextAction); } else { PlayeTwoNumbers.Add(nextAction); }
-                uct.MoveGameToNextState(gameTree, nextAction);
-                currentState = gameTree.SelectedNode.CorespondingState;
-                gameResult = game.Result(currentState);
-                Refresh();
-            }
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -120,17 +98,22 @@ namespace GUI
             flowDocument.Blocks.Add(paragraph);
 
             GameStateTextBox.Document = flowDocument;
+
+            PlayerOneScoreTB.Text = currentState.LongestSequences[Player.One].Length.ToString();
+            PlayerTwoScoreTB.Text = currentState.LongestSequences[Player.Two].Length.ToString();
         }
 
         public Run ColorNumber(int number, Brush brush)
         {
-            Run run = new Run(number + " ");
+            Run run = new Run(number.ToString());
             run.Foreground = brush;
             return run;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            PlayeOneNumbers = new List<int>();
+            PlayeTwoNumbers = new List<int>();
             StartButton.IsEnabled = false;
             game = new(configuration.N, configuration.K);
             uct = new(1.414, new IterationStopCondition(1000), game);
