@@ -54,7 +54,7 @@ namespace GUI
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Refresh();
+            RefreshUI();
         }
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -77,7 +77,7 @@ namespace GUI
             Dispatcher.BeginInvoke(new Action(() => { StartButton.IsEnabled = true; }));
         }
 
-        public void Refresh()
+        public void RefreshUI()
         {
             FlowDocument flowDocument = new FlowDocument();
             Paragraph paragraph = new Paragraph();
@@ -101,6 +101,14 @@ namespace GUI
 
             PlayerOneScoreTB.Text = currentState.LongestSequences[Player.One].Length.ToString();
             PlayerTwoScoreTB.Text = currentState.LongestSequences[Player.Two].Length.ToString();
+
+            PlayerOneSequenceTB.Text = GetSequenceString(Player.One);
+            PlayerTwoSequenceTB.Text = GetSequenceString(Player.Two);
+        }
+
+        public string GetSequenceString(Player player)
+        {
+            return string.Join(", ", Enumerable.Range(0, currentState.LongestSequences[player].Length).Select(y => y * currentState.LongestSequences[player].Step).Select(x => x + currentState.LongestSequences[player].FirstElement).ToArray());
         }
 
         public Run ColorNumber(int number, Brush brush)
