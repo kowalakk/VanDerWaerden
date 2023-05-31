@@ -42,8 +42,6 @@ internal class Program
                 Console.WriteLine($"Gracz drugi wygrywa!");
             else
                 Console.WriteLine($"Remis");
-            Console.WriteLine(currentState.LongestSequences[Player.One]);
-            Console.WriteLine(currentState.LongestSequences[Player.Two]);
         }
     }
 }
