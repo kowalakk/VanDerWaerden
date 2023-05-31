@@ -34,6 +34,7 @@ namespace GUI
         VanDerWaerdenGameSettings? configuration;
         BackgroundWorker backgroundWorker;
         DispatcherTimer gameTimer;
+        DispatcherTimer moveTimer;
         Game? game;
         State currentState;
         GameTree? gameTree;
@@ -49,6 +50,10 @@ namespace GUI
             gameTimer = new DispatcherTimer();
             gameTimer.Tick += GameTimer_Tick;
             gameTimer.Interval = new TimeSpan(0, 0, 1);
+
+            moveTimer = new DispatcherTimer();
+            moveTimer.Tick += MoveTimer_Tick;
+            moveTimer.Interval = new TimeSpan(0, 0, 1);
 
             backgroundWorker = new BackgroundWorker()
             {
@@ -69,6 +74,7 @@ namespace GUI
             GameResult gameResult = game.Result(currentState);
             while (gameResult == GameResult.InProgress)
             {
+                moveTimer.Start();
                 int nextAction = (int)uct.ChooseAction(gameTree)!;
                 string gracz = currentState.CurrentPlayer == Player.One ? "pierwszy" : "drugi";
                 if (currentState.CurrentPlayer == Player.One) { PlayeOneNumbers.Add(nextAction); } else { PlayeTwoNumbers.Add(nextAction); }
@@ -76,6 +82,7 @@ namespace GUI
                 currentState = gameTree.SelectedNode.CorespondingState;
                 gameResult = game.Result(currentState);
                 backgroundWorker.ReportProgress(1);
+                moveTimer.Stop();
             }
         }
 
@@ -112,6 +119,8 @@ namespace GUI
 
             PlayerOneSequenceTB.Text = GetSequenceString(Player.One);
             PlayerTwoSequenceTB.Text = GetSequenceString(Player.Two);
+
+            MoveTimerTB.Text = "00:00";
         }
 
         public string GetSequenceString(Player player)
@@ -147,6 +156,13 @@ namespace GUI
             DateTime time = DateTime.ParseExact(GameTimerTB.Text, "mm:ss", CultureInfo.InvariantCulture);
             time = time.AddSeconds(1);
             GameTimerTB.Text = time.ToString("mm:ss");
+        }
+
+        private void MoveTimer_Tick(object? sender, EventArgs e)
+        {
+            DateTime time = DateTime.ParseExact(MoveTimerTB.Text, "mm:ss", CultureInfo.InvariantCulture);
+            time = time.AddSeconds(1);
+            MoveTimerTB.Text = time.ToString("mm:ss");
         }
     }
 }
