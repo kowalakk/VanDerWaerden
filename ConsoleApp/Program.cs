@@ -14,21 +14,22 @@ internal class Program
             Console.WriteLine("Podaj długość wygrywającego ciągu arytmetycznego");
             int winningSequenceCount = Convert.ToInt32(Console.ReadLine());
             Game game = new(numbersCount, winningSequenceCount);
-            Uct uct = new(1.414, new IterationStopCondition(1000), game);
-            MiniMax miniMax = new(new IterationStopCondition(1000), game);
+            IAlgorithm playerOne = new Uct(1.414, new IterationStopCondition(1000), game);
+            IAlgorithm playerTwo = new MiniMax(game, 3);
+ 
             State currentState = game.InitialState();
             GameTree gameTree = new(currentState);
 
             GameResult gameResult = game.Result(currentState);
             while (gameResult == GameResult.InProgress)
             {
-                int nextAction = (int)uct.ChooseAction(gameTree)!;
-                Console.WriteLine($"Gracz pierwszy koloruje {nextAction}");
-                uct.MoveGameToNextState(gameTree, nextAction);
-                currentState = gameTree.SelectedNode.CorespondingState;
-                gameResult = game.Result(currentState);
-                if(gameResult != GameResult.InProgress)
-                    break;
+                (IAlgorithm currentAlgorithm, string player) = 
+                    currentState.CurrentPlayer == Player.One ? (playerOne, "pierwszy") : (playerTwo, "drugi");
+
+                int nextAction = currentAlgorithm.ReturnNextMove(gameTree.SelectedNode)!;
+
+                Console.WriteLine($"Gracz {player} koloruje {nextAction}");
+                gameTree.SelectChildNode(nextAction);
 
                 nextAction = miniMax.Search(currentState);
                 Console.WriteLine($"Gracz drugi koloruje {nextAction}");

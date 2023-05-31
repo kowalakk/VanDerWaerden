@@ -15,12 +15,11 @@ namespace Ai
             Game = game;
         }
 
-        public List<(int?, double)> MoveAssessment(GameTree gameTree)
+        public int ReturnNextMove(Node gameNode)
         {
-            UctSearch(gameTree.SelectedNode);
-            return gameTree.SelectedNode.ExpandedChildren
-                .Select(child => (child.CorespondingAction!, -(double)child.SuccessCount / child.VisitCount))
-                .ToList();
+            return (int)MoveAssessment(gameNode)
+                .MaxBy(action => { return action.Item2; })
+                .Item1!;
         }
 
         public int? ChooseAction(GameTree gameTree)
