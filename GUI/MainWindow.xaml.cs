@@ -19,6 +19,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Threading;
 using System.Globalization;
+using static System.Collections.Specialized.BitVector32;
 
 namespace GUI
 {
@@ -81,9 +82,26 @@ namespace GUI
 
                 IAlgorithm currentPlayer = currentState.CurrentPlayer == Player.One ? playerOne : playerTwo;
 
-                int nextAction = (int)currentPlayer.ReturnNextMove(gameTree.SelectedNode)!;
-                if (currentState.CurrentPlayer == Player.One) { PlayerOneNumbers.Add(nextAction); } else { PlayerTwoNumbers.Add(nextAction); }
-                gameTree.SelectChildNode(nextAction);
+                int nextAction = currentPlayer.ReturnNextMove(gameTree.SelectedNode)!;
+                if (currentState.CurrentPlayer == Player.One)
+                {
+                    PlayerOneNumbers.Add(nextAction);
+                }
+                else
+                {
+                    PlayerTwoNumbers.Add(nextAction);
+                }
+                try
+                {
+                    gameTree.SelectChildNode(nextAction);
+                }
+                catch
+                {
+                    State childState = game.PerformAction(nextAction, gameTree.SelectedNode.CorespondingState);
+                    Node childNode = new(nextAction, childState, gameTree.SelectedNode);
+                    gameTree.SelectedNode.ExpandedChildren.Add(childNode);
+                    gameTree.SelectChildNode(nextAction);
+                }
 
                 currentState = gameTree.SelectedNode.CorespondingState;
                 gameResult = game.Result(currentState);
@@ -167,7 +185,7 @@ namespace GUI
             PlayerOneNumbers = new List<int>();
             PlayerTwoNumbers = new List<int>();
             StartButton.IsEnabled = false;
-            
+
             GameTimerTB.Text = "00:00";
             gameTimer.Start();
 
@@ -187,7 +205,7 @@ namespace GUI
                 case "UCT":
                     return new Uct(1.414, new IterationStopCondition(1000), game);
                 case "MinMax":
-                    return new MiniMax(new IterationStopCondition(1000), game);
+                    return new MiniMax(game, 50 / game.NumbersCount);
                 case "Random":
                     break;
                 default:
