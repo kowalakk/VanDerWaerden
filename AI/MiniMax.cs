@@ -4,30 +4,25 @@ namespace Ai
 {
     public class MiniMax : IAlgorithm
     {
-        private IStopCondition StopCondition { get; set; }
         private Game Game { get; }
-        public MiniMax(IStopCondition condition, Game game)
+        private int Depth { get; set; }
+        public MiniMax(Game game, int depth)
         {
-            StopCondition = condition;
+            Depth = depth;
             Game = game;
         }
-        public int? ReturnNextMove(Node node)
+        public int ReturnNextMove(Node node)
         {
             return Search(node.CorespondingState);
         }
         public int Search(State state)
         {
-            if (StopCondition.Occured())
-                return 0;
             int bestScore = int.MinValue;
             int bestAction = default;
-            int score;
-            IList<int> actions = Game.PossibleActions(state).ToList();
-            actions.Shuffle();
-            foreach (int action in actions)
+            foreach (int action in Game.PossibleActions(state))
             {
                 State newState = Game.PerformAction(action, state);
-                score = -NegaMax(newState);
+                int score = -NegaMax(newState, Depth);
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -37,20 +32,17 @@ namespace Ai
             return bestAction;
         }
 
-        private int NegaMax(State state)
+        private int NegaMax(State state, int depth)
         {
-            if (StopCondition.Occured())
-                return 0;
+            if (depth == 0)
+                return Game.Heuristic(state);
             if (Game.Result(state) == GameResult.InProgress)
             {
-                int bestScore = int.MinValue;
-                int score;
-                IList<int> actions = Game.PossibleActions(state).ToList();
-                actions.Shuffle();
-                foreach (int action in actions)
+                int bestScore = -1;
+                foreach (int action in Game.PossibleActions(state))
                 {
                     State newState = Game.PerformAction(action, state);
-                    score = -NegaMax(newState);
+                    int score = -NegaMax(newState, depth - 1);
                     if (score > bestScore)
                     {
                         bestScore = score;
@@ -58,16 +50,12 @@ namespace Ai
                 }
                 return bestScore;
             }
+            else if (Game.Result(state) == GameResult.Draw)
+                return 0;
+            else if (Game.Result(state) == (GameResult)Game.CurrentPlayer(state))
+                return 1;
             else
-            {
-                StopCondition.Advance();
-                if (Game.Result(state) == GameResult.Draw)
-                    return 0;
-                else if (Game.Result(state) == (GameResult)Game.CurrentPlayer(state))
-                    return 1;
-                else
-                    return -1;
-            }
+                return -1;
         }
     }
 }

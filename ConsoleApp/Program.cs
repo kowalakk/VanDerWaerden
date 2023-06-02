@@ -35,8 +35,8 @@ internal class Program
             GameResult gameResult = game.Result(currentState);
             while (gameResult == GameResult.InProgress)
             {
-                IAlgorithm currentPlayer = currentState.CurrentPlayer == Player.One ? playerOne : playerTwo;
-                string player = currentState.CurrentPlayer == Player.One ? "pierwszy" : "drugi";
+                (IAlgorithm currentAlgorithm, string player) = 
+                    currentState.CurrentPlayer == Player.One ? (playerOne, "pierwszy") : (playerTwo, "drugi");
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 int nextAction = (int)currentPlayer.ReturnNextMove(gameTree.SelectedNode)!;

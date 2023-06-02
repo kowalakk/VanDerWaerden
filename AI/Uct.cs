@@ -16,11 +16,11 @@ namespace Ai
             Game = game;
         }
 
-        public int? ReturnNextMove(Node gameNode)
+        public int ReturnNextMove(Node gameNode)
         {
-            return MoveAssessment(gameNode)
+            return (int)MoveAssessment(gameNode)
                 .MaxBy(action => { return action.Item2; })
-                .Item1;
+                .Item1!;
         }
 
         private List<(int?, double)> MoveAssessment(Node gameNode)

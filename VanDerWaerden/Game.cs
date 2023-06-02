@@ -103,10 +103,26 @@
                 return GameResult.PlayerOneWins;
             if (state.LongestSequences[Player.Two].Length >= WinningSequenceCount)
                 return GameResult.PlayerTwoWins;
-            if (PossibleActions(state).Count() == 0)
+            if (!PossibleActions(state).Any())
                 return GameResult.Draw;
             return GameResult.InProgress;
         }
 
+        public int Heuristic(State state)
+        {
+            if (Result(state) == GameResult.InProgress)
+            {
+                int shortsightedBestAction = PossibleActions(state).MaxBy(action =>
+                    { return PerformAction(action, state).LongestSequences[state.CurrentPlayer].Length; }
+                    );
+                return -Heuristic(PerformAction(shortsightedBestAction, state));
+            }
+            else if (Result(state) == GameResult.Draw)
+                return 0;
+            else if (Result(state) == (GameResult)CurrentPlayer(state))
+                return 1;
+            else
+                return -1;
+        }
     }
 }
