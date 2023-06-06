@@ -20,7 +20,7 @@ namespace Ai
             Game = game;
         }
 
-        public int? ReturnNextMove(Node node)
+        public int ReturnNextMove(Node node)
         {
             var actions = Game.PossibleActions(node.CorespondingState).ToList();
             return actions[random.Next(actions.Count)];
