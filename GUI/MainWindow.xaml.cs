@@ -195,7 +195,7 @@ namespace GUI
             playerTwo = InitiatePlayerAlgorithm(configuration.Player2);
 
             currentState = game.InitialState();
-            gameTree = new(currentState);
+            gameTree = new(currentState, game);
             backgroundWorker.RunWorkerAsync();
         }
         private IAlgorithm InitiatePlayerAlgorithm(string alg)
@@ -205,9 +205,10 @@ namespace GUI
                 case "UCT":
                     return new Uct(1.414, new IterationStopCondition(1000), game);
                 case "MinMax":
-                    return new MiniMax(game, 50 / game.NumbersCount);
+                    return new MiniMax(game, 3);
                 case "Random":
-                    break;
+                    Random r = new Random();
+                    return new RandomPick(game, r.Next());
                 default:
                     break;
             }
